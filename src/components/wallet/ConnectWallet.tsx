@@ -11,9 +11,7 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { wallets, activeAddress } = useWallet()
-
-  const isKmd = (wallet: any) => wallet.id === 'kmd'
+  const { providers, activeAccount } = useWallet()
 
   return (
     <Dialog open={openModal} onOpenChange={(open) => !open && closeModal()}>
@@ -26,41 +24,41 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
         </div>
 
         <div className="space-y-4">
-          {activeAddress && (
+          {activeAccount && (
             <>
               <Account />
               <div className="h-px bg-border my-4" />
             </>
           )}
 
-          {!activeAddress && wallets?.map((wallet) => (
+          {!activeAccount && providers?.map((provider) => (
             <Button
-              data-test-id={`${wallet.id}-connect`}
+              data-test-id={`${provider.metadata.id}-connect`}
               className="flex items-center justify-start w-full gap-2 bg-card hover:bg-card/80 text-card-foreground border border-border"
-              key={`provider-${wallet.id}`}
+              key={`provider-${provider.metadata.id}`}
               variant="outline"
-              onClick={() => wallet.connect()}
+              onClick={() => provider.connect()}
             >
-              {!isKmd(wallet) && (
+              {provider.metadata.icon && (
                 <img
-                  alt={`wallet_icon_${wallet.id}`}
-                  src={wallet.metadata.icon}
+                  alt={`wallet_icon_${provider.metadata.id}`}
+                  src={provider.metadata.icon}
                   className="w-6 h-6 object-contain"
                 />
               )}
-              <span>{isKmd(wallet) ? 'LocalNet Wallet' : wallet.metadata.name}</span>
+              <span>{provider.metadata.name}</span>
             </Button>
           ))}
 
-          {activeAddress && (
+          {activeAccount && (
             <Button
               className="w-full bg-destructive hover:bg-destructive/90"
               data-test-id="logout"
               onClick={async () => {
-                if (wallets) {
-                  const activeWallet = wallets.find((w) => w.isActive)
-                  if (activeWallet) {
-                    await activeWallet.disconnect()
+                if (providers) {
+                  const activeProvider = providers.find((p) => p.isActive)
+                  if (activeProvider) {
+                    await activeProvider.disconnect()
                   } else {
                     // Required for logout/cleanup of inactive providers
                     localStorage.removeItem('@txnlab/use-wallet-react:v3')

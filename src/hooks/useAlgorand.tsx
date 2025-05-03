@@ -6,12 +6,12 @@ import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { activeAddress, isReady } = useWallet();
+  const { activeAccount, isReady } = useWallet();
   
   // Use the wallet connection state from @txnlab/use-wallet-react
   const state: AlgorandState = {
-    connected: !!activeAddress,
-    address: activeAddress || null,
+    connected: !!activeAccount,
+    address: activeAccount?.address || null,
     loading: !isReady || loading,
     error: null,
   };
