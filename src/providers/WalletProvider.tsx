@@ -5,6 +5,12 @@ import { PeraWalletConnect } from '@perawallet/connect';
 import { DeflyWalletConnect } from '@blockshake/defly-connect';
 import { DaffiWalletConnect } from '@daffiwallet/connect';
 
+// Polyfill for 'global' object that WalletConnect expects in browser environment
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.global = window;
+}
+
 // Create wallet connection instances
 const pera = new PeraWalletConnect();
 const defly = new DeflyWalletConnect();
