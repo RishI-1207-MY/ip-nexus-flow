@@ -6,13 +6,13 @@ import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { activeAccount, isReady } = useWallet();
+  const { activeAccount, activeProvider } = useWallet();
   
   // Use the wallet connection state from @txnlab/use-wallet-react
   const state: AlgorandState = {
     connected: !!activeAccount,
     address: activeAccount?.address || null,
-    loading: !isReady || loading,
+    loading,
     error: null,
   };
 
@@ -34,11 +34,17 @@ export const useAlgorand = () => {
     }
   }, []);
 
-  const disconnectWallet = useCallback(() => {
-    // Actual disconnection is handled in the ConnectWallet component
-    // This is just a placeholder to maintain API compatibility
-    toast.success('Wallet disconnected');
-  }, []);
+  const disconnectWallet = useCallback(async () => {
+    try {
+      if (activeProvider) {
+        await activeProvider.disconnect();
+        toast.success('Wallet disconnected');
+      }
+    } catch (error: any) {
+      console.error('Failed to disconnect wallet:', error);
+      toast.error('Failed to disconnect wallet');
+    }
+  }, [activeProvider]);
 
   return {
     ...state,

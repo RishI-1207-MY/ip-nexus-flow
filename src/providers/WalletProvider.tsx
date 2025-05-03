@@ -12,22 +12,22 @@ if (typeof window !== 'undefined') {
   window.global = window;
 }
 
-// Create wallet connection instances
-const pera = new PeraWalletConnect();
-const defly = new DeflyWalletConnect();
-const daffi = new DaffiWalletConnect();
-
 // Create Algorand client
 const algodServer = 'https://testnet-api.algonode.cloud';
 const algodPort = '';
 const algodToken = '';
 const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
 
-// Map wallet providers
-const wallets = [
-  { id: 'pera-wallet', wallet: pera, name: 'Pera Wallet' },
-  { id: 'defly-wallet', wallet: defly, name: 'Defly Wallet' },
-  { id: 'daffi-wallet', wallet: daffi, name: 'Daffi Wallet' }
+// Create wallet connection instances
+const pera = new PeraWalletConnect();
+const defly = new DeflyWalletConnect();
+const daffi = new DaffiWalletConnect();
+
+// Map wallet providers - updated for @txnlab/use-wallet-react v4
+const providers = [
+  { id: 'pera-wallet', name: 'Pera Wallet', icon: 'https://perawallet.app/favicon.ico', wallet: pera },
+  { id: 'defly-wallet', name: 'Defly Wallet', icon: 'https://defly.app/favicon.ico', wallet: defly },
+  { id: 'daffi-wallet', name: 'Daffi Wallet', icon: 'https://daffi.me/favicon.ico', wallet: daffi }
 ];
 
 export function WalletProvider({ children }: PropsWithChildren) {
@@ -49,7 +49,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
 
   return (
     <UseWalletProvider
-      wallets={wallets}
+      providers={providers}
       algodClient={algodClient}
       network={'testnet'}
     >
