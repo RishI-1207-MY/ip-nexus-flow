@@ -11,6 +11,7 @@ const defly = new DeflyWalletConnect();
 const daffi = new DaffiWalletConnect();
 
 // Map of wallet connection providers to implement
+// @txnlab/use-wallet-react v4 requires 'wallets' instead of 'providers'
 const walletProviders = {
   pera,
   defly,
@@ -36,7 +37,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
 
   return (
     <UseWalletProvider
-      providers={walletProviders}
+      wallets={walletProviders}
       nodeConfig={{ 
         network: 'testnet', // Change to 'mainnet' for production
         nodeServer: 'https://testnet-api.algonode.cloud', // Use appropriate endpoint 
