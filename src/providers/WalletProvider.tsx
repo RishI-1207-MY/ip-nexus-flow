@@ -1,6 +1,6 @@
 
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { PROVIDER_ID, WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
+import { WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
 import { PeraWalletConnect } from '@perawallet/connect';
 import { DeflyWalletConnect } from '@blockshake/defly-connect';
 import { DaffiWalletConnect } from '@daffiwallet/connect';
@@ -25,9 +25,9 @@ const daffi = new DaffiWalletConnect();
 
 // Define wallet providers for @txnlab/use-wallet-react
 const wallets = [
-  { id: PROVIDER_ID.PERA, name: 'Pera Wallet', icon: 'https://perawallet.app/favicon.ico', provider: pera },
-  { id: PROVIDER_ID.DEFLY, name: 'Defly Wallet', icon: 'https://defly.app/favicon.ico', provider: defly },
-  { id: PROVIDER_ID.DAFFI, name: 'Daffi Wallet', icon: 'https://daffi.me/favicon.ico', provider: daffi }
+  { id: 'pera-wallet', name: 'Pera Wallet', icon: 'https://perawallet.app/favicon.ico', wallet: pera },
+  { id: 'defly-wallet', name: 'Defly Wallet', icon: 'https://defly.app/favicon.ico', wallet: defly },
+  { id: 'daffi-wallet', name: 'Daffi Wallet', icon: 'https://daffi.me/favicon.ico', wallet: daffi }
 ];
 
 export function WalletProvider({ children }: PropsWithChildren) {
@@ -49,15 +49,9 @@ export function WalletProvider({ children }: PropsWithChildren) {
 
   return (
     <UseWalletProvider
-      providers={wallets}
-      nodeConfig={{
-        network: 'testnet',
-        nodeServer: algodServer,
-        nodeToken: algodToken,
-        nodePort: algodPort,
-        nodeTLS: true
-      }}
-      algosdkStatic={algosdk}
+      wallets={wallets}
+      algodClient={algodClient}
+      network={'testnet'}
     >
       {children}
     </UseWalletProvider>

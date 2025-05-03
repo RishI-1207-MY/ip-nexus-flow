@@ -11,12 +11,7 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, providers, setActiveProvider } = useWallet()
-
-  const handleDisconnect = async () => {
-    // The useWallet hook handles disconnection internally when setting activeProvider to null
-    setActiveProvider(null);
-  };
+  const { activeAccount, wallets, disconnect } = useWallet()
 
   return (
     <Dialog open={openModal} onOpenChange={(open) => !open && closeModal()}>
@@ -36,22 +31,22 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
             </>
           )}
 
-          {!activeAccount && providers?.map((provider) => (
+          {!activeAccount && wallets?.map((wallet) => (
             <Button
-              data-test-id={`${provider.id}-connect`}
+              data-test-id={`${wallet.id}-connect`}
               className="flex items-center justify-start w-full gap-2 bg-card hover:bg-card/80 text-card-foreground border border-border"
-              key={`wallet-${provider.id}`}
+              key={`wallet-${wallet.id}`}
               variant="outline"
-              onClick={() => provider.connect()}
+              onClick={() => wallet.connect()}
             >
-              {provider.metadata.icon && (
+              {wallet.icon && (
                 <img
-                  alt={`wallet_icon_${provider.id}`}
-                  src={provider.metadata.icon}
+                  alt={`wallet_icon_${wallet.id}`}
+                  src={wallet.icon}
                   className="w-6 h-6 object-contain"
                 />
               )}
-              <span>{provider.metadata.name}</span>
+              <span>{wallet.name}</span>
             </Button>
           ))}
 
@@ -59,7 +54,9 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
             <Button
               className="w-full bg-destructive hover:bg-destructive/90"
               data-test-id="logout"
-              onClick={handleDisconnect}
+              onClick={async () => {
+                await disconnect();
+              }}
             >
               Disconnect Wallet
             </Button>
