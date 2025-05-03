@@ -11,7 +11,7 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, providers, connectedProvider } = useWallet()
+  const { activeAccount, wallets, disconnect } = useWallet()
 
   return (
     <Dialog open={openModal} onOpenChange={(open) => !open && closeModal()}>
@@ -31,22 +31,22 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
             </>
           )}
 
-          {!activeAccount && providers?.map((provider) => (
+          {!activeAccount && wallets?.map((wallet) => (
             <Button
-              data-test-id={`${provider.id}-connect`}
+              data-test-id={`${wallet.id}-connect`}
               className="flex items-center justify-start w-full gap-2 bg-card hover:bg-card/80 text-card-foreground border border-border"
-              key={`provider-${provider.id}`}
+              key={`wallet-${wallet.id}`}
               variant="outline"
-              onClick={() => provider.connect()}
+              onClick={() => wallet.connect()}
             >
-              {provider.icon && (
+              {wallet.icon && (
                 <img
-                  alt={`wallet_icon_${provider.id}`}
-                  src={provider.icon}
+                  alt={`wallet_icon_${wallet.id}`}
+                  src={wallet.icon}
                   className="w-6 h-6 object-contain"
                 />
               )}
-              <span>{provider.name}</span>
+              <span>{wallet.name}</span>
             </Button>
           ))}
 
@@ -55,9 +55,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
               className="w-full bg-destructive hover:bg-destructive/90"
               data-test-id="logout"
               onClick={async () => {
-                if (connectedProvider) {
-                  await connectedProvider.disconnect();
-                }
+                await disconnect();
               }}
             >
               Disconnect Wallet
