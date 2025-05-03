@@ -4,7 +4,7 @@ import { WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
 import { PeraWalletConnect } from '@perawallet/connect';
 import { DeflyWalletConnect } from '@blockshake/defly-connect';
 import { DaffiWalletConnect } from '@daffiwallet/connect';
-import { WalletId } from '@txnlab/use-wallet-react';
+import { PROVIDER_ID } from '@txnlab/use-wallet-react';
 
 // Create wallet connection instances
 const pera = new PeraWalletConnect();
@@ -13,9 +13,9 @@ const daffi = new DaffiWalletConnect();
 
 // Map of wallet connection providers to implement
 const walletProviders = {
-  [WalletId.PERA]: pera,
-  [WalletId.DEFLY]: defly,
-  [WalletId.DAFFI]: daffi
+  [PROVIDER_ID.PERA]: pera,
+  [PROVIDER_ID.DEFLY]: defly,
+  [PROVIDER_ID.DAFFI]: daffi
 };
 
 export function WalletProvider({ children }: PropsWithChildren) {
@@ -37,7 +37,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
 
   return (
     <UseWalletProvider
-      providers={walletProviders}
+      wallets={walletProviders}
       nodeConfig={{ 
         network: 'testnet', // Change to 'mainnet' for production
         nodeServer: 'https://testnet-api.algonode.cloud', // Use appropriate endpoint 

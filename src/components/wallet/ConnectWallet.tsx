@@ -1,5 +1,5 @@
 
-import { useWallet, Wallet, WalletId } from '@txnlab/use-wallet-react'
+import { useWallet, PROVIDER_ID } from '@txnlab/use-wallet-react'
 import Account from './Account'
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from '../ui/button'
@@ -13,7 +13,7 @@ interface ConnectWalletInterface {
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
   const { wallets, activeAddress } = useWallet()
 
-  const isKmd = (wallet: Wallet) => wallet.id === WalletId.KMD
+  const isKmd = (wallet: any) => wallet.id === PROVIDER_ID.KMD
 
   return (
     <Dialog open={openModal} onOpenChange={(open) => !open && closeModal()}>
