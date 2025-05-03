@@ -23,8 +23,8 @@ const pera = new PeraWalletConnect();
 const defly = new DeflyWalletConnect();
 const daffi = new DaffiWalletConnect();
 
-// Map wallet providers - updated for @txnlab/use-wallet-react v4
-const providers = [
+// Map wallet providers for @txnlab/use-wallet-react
+const wallets = [
   { id: 'pera-wallet', name: 'Pera Wallet', icon: 'https://perawallet.app/favicon.ico', wallet: pera },
   { id: 'defly-wallet', name: 'Defly Wallet', icon: 'https://defly.app/favicon.ico', wallet: defly },
   { id: 'daffi-wallet', name: 'Daffi Wallet', icon: 'https://daffi.me/favicon.ico', wallet: daffi }
@@ -49,7 +49,7 @@ export function WalletProvider({ children }: PropsWithChildren) {
 
   return (
     <UseWalletProvider
-      providers={providers}
+      wallets={wallets}
       algodClient={algodClient}
       network={'testnet'}
     >
