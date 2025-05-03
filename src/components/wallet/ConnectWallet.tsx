@@ -1,5 +1,5 @@
 
-import { useWallet, PROVIDER_ID } from '@txnlab/use-wallet-react'
+import { useWallet } from '@txnlab/use-wallet-react'
 import Account from './Account'
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from '../ui/button'
@@ -13,7 +13,7 @@ interface ConnectWalletInterface {
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
   const { wallets, activeAddress } = useWallet()
 
-  const isKmd = (wallet: any) => wallet.id === PROVIDER_ID.KMD
+  const isKmd = (wallet: any) => wallet.id === 'kmd'
 
   return (
     <Dialog open={openModal} onOpenChange={(open) => !open && closeModal()}>
@@ -63,7 +63,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
                     await activeWallet.disconnect()
                   } else {
                     // Required for logout/cleanup of inactive providers
-                    localStorage.removeItem('@txnlab/use-wallet:v3')
+                    localStorage.removeItem('@txnlab/use-wallet-react:v3')
                     window.location.reload()
                   }
                 }
