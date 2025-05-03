@@ -10,6 +10,7 @@ import Navbar from "./components/layout/Navbar";
 import TokenizationForm from "./components/tokenization/TokenizationForm";
 import Marketplace from "./components/marketplace/Marketplace";
 import FractionalOwnership from "./components/fractional/FractionalOwnership";
+import TokenDetails from "./components/token/TokenDetails";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/tokenize" element={<TokenizationForm />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/portfolio" element={<FractionalOwnership />} />
+          <Route path="/token/:id" element={<TokenDetails />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

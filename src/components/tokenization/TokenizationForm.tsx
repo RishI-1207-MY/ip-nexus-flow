@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,9 +54,14 @@ export const TokenizationForm = () => {
     setIsSubmitting(true);
     
     try {
-      // Format the data for the API call
+      // Format the data for the API call ensuring all required fields are included
       const formData: TokenizationFormData = {
-        ...data,
+        name: data.name,
+        description: data.description,
+        ipType: data.ipType,
+        totalSupply: data.totalSupply,
+        royaltyPercentage: data.royaltyPercentage,
+        price: data.price,
         metadata: data.metadata || {},
       };
       
