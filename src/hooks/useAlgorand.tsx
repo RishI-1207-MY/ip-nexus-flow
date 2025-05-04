@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
-  const { activeAccount, setActiveAccount, wallets, isReady } = useWallet();
+  const { activeAccount, connectedAccounts, isReady, isActive, connect, disconnect } = useWallet();
   
   const [state, setState] = useState<AlgorandState>({
     connected: !!activeAccount,
@@ -28,19 +28,8 @@ export const useAlgorand = () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
       
-      // Find available active wallets
-      const availableWallet = wallets.find(wallet => wallet.isActive);
-      
-      if (availableWallet) {
-        // This will trigger the wallet's connection UI
-        const accounts = await availableWallet.connect();
-        
-        if (accounts && accounts.length > 0) {
-          setActiveAccount(accounts[0]);
-        }
-      } else {
-        throw new Error('No wallet provider is available');
-      }
+      // This will open modal for selecting a wallet provider
+      await connect();
       
       setState(prev => ({
         ...prev,
@@ -57,20 +46,12 @@ export const useAlgorand = () => {
         description: error.message || 'Please try again',
       });
     }
-  }, [wallets, setActiveAccount]);
+  }, [connect]);
 
   const disconnectWallet = useCallback(async () => {
     try {
-      if (activeAccount) {
-        const activeWallet = wallets.find(
-          wallet => wallet.accounts.some(acc => acc.address === activeAccount.address)
-        );
-        
-        if (activeWallet) {
-          await activeWallet.disconnect();
-        }
-        
-        setActiveAccount(null);
+      if (isActive) {
+        await disconnect();
       }
       
       setState({
@@ -87,13 +68,14 @@ export const useAlgorand = () => {
         description: error.message || 'Please try again',
       });
     }
-  }, [activeAccount, wallets, setActiveAccount]);
+  }, [isActive, disconnect]);
 
   return {
     ...state,
     connectWallet,
     disconnectWallet,
-    loading: !isReady || state.loading
+    loading: !isReady || state.loading,
+    connectedAccounts
   };
 };
 

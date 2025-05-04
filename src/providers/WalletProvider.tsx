@@ -1,6 +1,6 @@
 
 import { ReactNode, useMemo } from 'react';
-import { WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
+import { PROVIDER_ID, WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
 import { DeflyWalletConnect } from '@blockshake/defly-connect';
 import { PeraWalletConnect } from '@perawallet/connect';
 import { DaffiWalletConnect } from '@daffiwallet/connect';
@@ -26,18 +26,22 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   const defly = useMemo(() => new DeflyWalletConnect(), []);
   const daffi = useMemo(() => new DaffiWalletConnect(), []);
 
-  // Configure the wallets that will be used in the app
-  const wallets = useMemo(() => [
-    { id: 'pera-wallet', name: 'Pera', adapter: pera },
-    { id: 'defly-wallet', name: 'Defly', adapter: defly },
-    { id: 'daffi-wallet', name: 'Daffi', adapter: daffi }
+  // Configure the providers that will be used in the app
+  const providers = useMemo(() => [
+    { id: PROVIDER_ID.PERA, clientStatic: pera },
+    { id: PROVIDER_ID.DEFLY, clientStatic: defly },
+    { id: PROVIDER_ID.DAFFI, clientStatic: daffi }
   ], [pera, defly, daffi]);
 
   return (
     <UseWalletProvider
-      wallets={wallets}
-      network="testnet"
-      algodClient={algodClient}
+      providers={providers}
+      nodeConfig={{ 
+        network: 'testnet', 
+        nodeServer: algodServer,
+        nodePort: algodPort,
+        nodeToken: algodToken 
+      }}
     >
       {children}
     </UseWalletProvider>

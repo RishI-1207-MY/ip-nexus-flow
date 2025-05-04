@@ -8,19 +8,11 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, wallets, setActiveAccount } = useWallet();
+  const { activeAccount, providers, isActive, connect, disconnect } = useWallet();
 
   const handleDisconnect = async () => {
-    if (activeAccount) {
-      const activeWallet = wallets.find(
-        wallet => wallet.accounts.some(acc => acc.address === activeAccount.address)
-      );
-      
-      if (activeWallet) {
-        await activeWallet.disconnect();
-      }
-      
-      setActiveAccount(null);
+    if (isActive) {
+      await disconnect();
     }
   };
 
@@ -38,32 +30,27 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
           )}
 
           {!activeAccount &&
-            wallets.map((wallet) => (
+            providers.map((provider) => (
               <button
-                data-test-id={`${wallet.id}-connect`}
+                data-test-id={`${provider.id}-connect`}
                 className="btn border-teal-800 border-1 m-2"
-                key={`wallet-${wallet.id}`}
+                key={`provider-${provider.id}`}
                 onClick={async () => {
-                  if (wallet.isConnected) return;
-                  
                   try {
-                    const accounts = await wallet.connect();
-                    if (accounts && accounts.length > 0) {
-                      setActiveAccount(accounts[0]);
-                    }
+                    await connect(provider.id);
                   } catch (error) {
                     console.error("Failed to connect wallet:", error);
                   }
                 }}
               >
-                {wallet.metadata?.icon && (
+                {provider.metadata?.icon && (
                   <img
-                    alt={`wallet_icon_${wallet.id}`}
-                    src={wallet.metadata.icon}
+                    alt={`wallet_icon_${provider.id}`}
+                    src={provider.metadata.icon}
                     style={{ objectFit: 'contain', width: '30px', height: 'auto' }}
                   />
                 )}
-                <span>{wallet.metadata?.name || wallet.id}</span>
+                <span>{provider.metadata?.name || provider.id}</span>
               </button>
             ))}
         </div>
