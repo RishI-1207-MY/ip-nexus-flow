@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
-  const { activeAddress, disconnect, activeAccount } = useWallet();
+  const { activeAddress, disconnect: walletDisconnect, activeAccount, providers } = useWallet();
   
   const [state, setState] = useState<AlgorandState>({
     connected: !!activeAddress,
@@ -49,8 +49,8 @@ export const useAlgorand = () => {
 
   const disconnectWallet = useCallback(async () => {
     try {
-      if (activeAccount) {
-        await disconnect();
+      if (activeAccount && walletDisconnect) {
+        await walletDisconnect();
       }
       
       setState({
@@ -67,7 +67,7 @@ export const useAlgorand = () => {
         description: error.message || 'Please try again',
       });
     }
-  }, [activeAccount, disconnect]);
+  }, [activeAccount, walletDisconnect]);
 
   return {
     ...state,

@@ -1,6 +1,6 @@
 
 import { ReactNode } from 'react';
-import { WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
+import { useInitializeProviders, WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
 import { DeflyWalletConnect } from '@blockshake/defly-connect';
 import { PeraWalletConnect } from '@perawallet/connect';
 import { DaffiWalletConnect } from '@daffiwallet/connect';
@@ -17,43 +17,18 @@ interface WalletProviderProps {
 }
 
 export const WalletProvider = ({ children }: WalletProviderProps) => {
-  const pera = new PeraWalletConnect();
-  const defly = new DeflyWalletConnect();
-  const daffi = new DaffiWalletConnect();
-
-  const wallets = [
-    {
-      id: 'pera',
-      name: 'Pera Wallet',
-      wallet: pera,
-      metadata: {
-        name: 'Pera Wallet',
-        icon: 'https://perawallet.app/static/logo-512.png',
-      }
-    },
-    {
-      id: 'defly',
-      name: 'Defly Wallet',
-      wallet: defly,
-      metadata: {
-        name: 'Defly Wallet',
-        icon: 'https://defly.app/assets/img/favicon/apple-touch-icon.png',
-      }
-    },
-    {
-      id: 'daffi',
-      name: 'Daffi Wallet',
-      wallet: daffi,
-      metadata: {
-        name: 'Daffi Wallet',
-        icon: 'https://daffiwallet.io/static/icon-512x512-8a94027b32555f9edc584afc3c8b2015.png',
-      }
-    }
-  ];
+  // Initialize providers and get the wallets with useInitializeProviders
+  const { providers, activeAddress } = useInitializeProviders([
+    { id: 'pera', clientStatic: PeraWalletConnect },
+    { id: 'defly', clientStatic: DeflyWalletConnect },
+    { id: 'daffi', clientStatic: DaffiWalletConnect },
+  ]);
 
   return (
     <UseWalletProvider
-      wallets={wallets}
+      providers={providers}
+      activeAddress={activeAddress}
+      activeProvider={providers.find((p) => p.accounts.length > 0)?.id}
       algodClient={algodClient}
       network="testnet"
     >

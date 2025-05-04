@@ -8,7 +8,14 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, wallets, activeAddress, disconnect } = useWallet();
+  const { activeAccount, providers, activeAddress } = useWallet();
+
+  const handleDisconnect = async () => {
+    const provider = providers.find(p => p.isActive);
+    if (provider) {
+      await provider.disconnect();
+    }
+  };
 
   return (
     <dialog id="connect_wallet_modal" className={`modal ${openModal ? 'modal-open' : ''}`} style={{ display: openModal ? 'block' : 'none' }}>
@@ -24,21 +31,21 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
           )}
 
           {!activeAddress &&
-            wallets?.map((wallet) => (
+            providers.map((provider) => (
               <button
-                data-test-id={`${wallet.id}-connect`}
+                data-test-id={`${provider.id}-connect`}
                 className="btn border-teal-800 border-1 m-2"
-                key={`provider-${wallet.id}`}
+                key={`provider-${provider.id}`}
                 onClick={() => {
-                  return wallet.connect();
+                  provider.connect();
                 }}
               >
                 <img
-                  alt={`wallet_icon_${wallet.id}`}
-                  src={wallet.metadata.icon}
+                  alt={`wallet_icon_${provider.id}`}
+                  src={provider.metadata.icon}
                   style={{ objectFit: 'contain', width: '30px', height: 'auto' }}
                 />
-                <span>{wallet.metadata.name}</span>
+                <span>{provider.metadata.name}</span>
               </button>
             ))}
         </div>
@@ -57,16 +64,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
             <button
               className="btn btn-warning"
               data-test-id="logout"
-              onClick={async () => {
-                if (activeAccount) {
-                  await disconnect();
-                } else {
-                  // Fallback cleanup
-                  localStorage.removeItem('@txnlab/use-wallet:v3');
-                  localStorage.removeItem('@txnlab/use-wallet:v4');
-                  window.location.reload();
-                }
-              }}
+              onClick={handleDisconnect}
             >
               Logout
             </button>

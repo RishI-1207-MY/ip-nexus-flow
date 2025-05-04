@@ -57,7 +57,12 @@ export const TokenizationForm = () => {
     try {
       // Format the data for the API call
       const formData: TokenizationFormData = {
-        ...data,
+        name: data.name,
+        description: data.description,
+        ipType: data.ipType,
+        totalSupply: data.totalSupply,
+        royaltyPercentage: data.royaltyPercentage,
+        price: data.price,
         metadata: data.metadata || {},
       };
       
