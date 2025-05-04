@@ -3,20 +3,29 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAlgorand } from "@/hooks/useAlgorand";
 import { Link } from "react-router-dom";
-import ConnectWallet from "../wallet/ConnectWallet";
-import { Wallet } from "lucide-react";
+import { toast } from "sonner";
 
 export const Navbar = () => {
-  const { connected, address, loading } = useAlgorand();
+  const { connected, address, connectWallet, disconnectWallet, loading } = useAlgorand();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const handleWalletClick = () => {
-    setIsWalletModalOpen(true);
+    if (connected) {
+      disconnectWallet();
+    } else {
+      connectWallet();
+    }
+  };
+
+  const handleCopyAddress = () => {
+    if (address) {
+      navigator.clipboard.writeText(address);
+      toast.success("Address copied to clipboard");
+    }
   };
 
   return (
@@ -37,14 +46,26 @@ export const Navbar = () => {
             </div>
           </div>
           <div className="hidden md:flex items-center">
+            {connected && address && (
+              <div className="mr-4 px-3 py-1 rounded-full bg-muted flex items-center">
+                <span className="text-xs text-muted-foreground">
+                  {`${address.substring(0, 6)}...${address.substring(address.length - 4)}`}
+                </span>
+                <button 
+                  onClick={handleCopyAddress} 
+                  className="ml-2 text-xs text-ip-purple-500 hover:text-ip-purple-400"
+                >
+                  Copy
+                </button>
+              </div>
+            )}
             <Button 
               onClick={handleWalletClick} 
               variant={connected ? "outline" : "default"}
               className={`button-glow ${connected ? "border-ip-purple-500 text-ip-purple-500" : "bg-ip-purple-500 hover:bg-ip-purple-600"}`}
               disabled={loading}
             >
-              <Wallet className="mr-2 h-4 w-4" />
-              {loading ? "Connecting..." : connected ? "Connected" : "Connect Wallet"}
+              {loading ? "Connecting..." : connected ? "Disconnect" : "Connect Wallet"}
             </Button>
           </div>
           <div className="flex md:hidden">
@@ -85,24 +106,20 @@ export const Navbar = () => {
             </Link>
             <div className="pt-4">
               <Button 
-                onClick={handleWalletClick} 
+                onClick={() => {
+                  handleWalletClick();
+                  setIsMobileMenuOpen(false);
+                }} 
                 variant={connected ? "outline" : "default"}
                 className={`w-full button-glow ${connected ? "border-ip-purple-500 text-ip-purple-500" : "bg-ip-purple-500 hover:bg-ip-purple-600"}`}
                 disabled={loading}
               >
-                <Wallet className="mr-2 h-4 w-4" />
-                {loading ? "Connecting..." : connected ? "Connected" : "Connect Wallet"}
+                {loading ? "Connecting..." : connected ? "Disconnect" : "Connect Wallet"}
               </Button>
             </div>
           </div>
         </div>
       )}
-      
-      {/* Wallet Connection Modal */}
-      <ConnectWallet
-        openModal={isWalletModalOpen}
-        closeModal={() => setIsWalletModalOpen(false)}
-      />
     </nav>
   );
 };

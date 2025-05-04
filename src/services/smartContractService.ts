@@ -1,6 +1,5 @@
 
 import { IPToken, TokenizationFormData } from "@/types";
-import { algorandService } from "./algorandService";
 
 // This is a mock service that simulates interactions with the Algorand smart contract
 // In a real implementation, this would use the algosdk library to interact with the blockchain
