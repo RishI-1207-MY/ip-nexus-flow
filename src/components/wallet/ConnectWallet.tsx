@@ -11,14 +11,12 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, wallets } = useWallet()
+  const { activeAccount, providers, activeProvider, setActiveProvider } = useWallet()
 
   const handleDisconnect = async () => {
     try {
-      // Find active wallet and disconnect
-      const activeWallet = wallets.find(wallet => wallet.accounts.some(account => account.address === activeAccount?.address));
-      if (activeWallet) {
-        await activeWallet.disconnect();
+      if (activeProvider) {
+        await activeProvider.disconnect();
       }
     } catch (error) {
       console.error("Failed to disconnect wallet:", error);
@@ -43,21 +41,20 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
             </>
           )}
 
-          {!activeAccount && wallets?.map((wallet) => (
+          {!activeAccount && providers?.map((provider) => (
             <Button
-              data-test-id={`${wallet.id}-connect`}
+              data-test-id={`${provider.metadata.id}-connect`}
               className="flex items-center justify-start w-full gap-2 bg-card hover:bg-card/80 text-card-foreground border border-border"
-              key={`wallet-${wallet.id}`}
+              key={`wallet-${provider.metadata.id}`}
               variant="outline"
-              onClick={() => wallet.connect()}
+              onClick={() => {
+                setActiveProvider(provider.metadata.id);
+              }}
             >
-              {/* We don't have icons in the basic wallet object, so we'll use a conditional check */}
-              {wallet.name && (
-                <div className="w-6 h-6 flex items-center justify-center rounded-full bg-muted">
-                  {wallet.name.charAt(0)}
-                </div>
-              )}
-              <span>{wallet.name}</span>
+              <div className="w-6 h-6 flex items-center justify-center rounded-full bg-muted">
+                {provider.metadata.name.charAt(0)}
+              </div>
+              <span>{provider.metadata.name}</span>
             </Button>
           ))}
 

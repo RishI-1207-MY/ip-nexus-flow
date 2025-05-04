@@ -6,7 +6,7 @@ import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { activeAccount, wallets } = useWallet();
+  const { activeAccount, setActiveProvider, activeProvider } = useWallet();
   
   // Use the wallet connection state from @txnlab/use-wallet-react
   const state: AlgorandState = {
@@ -36,17 +36,15 @@ export const useAlgorand = () => {
 
   const disconnectWallet = useCallback(async () => {
     try {
-      // Find the active wallet and call its disconnect method
-      const activeWallet = wallets.find(wallet => wallet.accounts.some(account => account.address === activeAccount?.address));
-      if (activeWallet) {
-        await activeWallet.disconnect();
+      if (activeProvider) {
+        await activeProvider.disconnect();
         toast.success('Wallet disconnected');
       }
     } catch (error: any) {
       console.error('Failed to disconnect wallet:', error);
       toast.error('Failed to disconnect wallet');
     }
-  }, [activeAccount, wallets]);
+  }, [activeProvider]);
 
   return {
     ...state,

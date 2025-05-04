@@ -1,6 +1,6 @@
 
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
+import { PROVIDER_ID, WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
 import { PeraWalletConnect } from '@perawallet/connect';
 import { DeflyWalletConnect } from '@blockshake/defly-connect';
 import { DaffiWalletConnect } from '@daffiwallet/connect';
@@ -17,11 +17,6 @@ const algodServer = 'https://testnet-api.algonode.cloud';
 const algodPort = '';
 const algodToken = '';
 const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
-
-// Create wallet connection instances
-const pera = new PeraWalletConnect();
-const defly = new DeflyWalletConnect();
-const daffi = new DaffiWalletConnect();
 
 export function WalletProvider({ children }: PropsWithChildren) {
   const [isReady, setIsReady] = useState(false);
@@ -40,17 +35,26 @@ export function WalletProvider({ children }: PropsWithChildren) {
     return null;
   }
 
+  const pera = new PeraWalletConnect();
+  const defly = new DeflyWalletConnect();
+  const daffi = new DaffiWalletConnect();
+  
   return (
     <UseWalletProvider
-      value={{
-        wallets: [
-          { id: 'pera', name: 'Pera Wallet', wallet: pera },
-          { id: 'defly', name: 'Defly Wallet', wallet: defly },
-          { id: 'daffi', name: 'Daffi Wallet', wallet: daffi },
-        ],
-        network: 'TestNet',
-        algodClient,
+      id="wallet-provider"
+      name="IP Nexus"
+      providers={[
+        { id: PROVIDER_ID.PERA, clientStatic: pera },
+        { id: PROVIDER_ID.DEFLY, clientStatic: defly },
+        { id: PROVIDER_ID.DAFFI, clientStatic: daffi }
+      ]}
+      nodeConfig={{
+        network: 'testnet',
+        nodeServer: algodServer,
+        nodeToken: algodToken,
+        nodePort: algodPort,
       }}
+      algosdkStatic={algosdk}
     >
       {children}
     </UseWalletProvider>
