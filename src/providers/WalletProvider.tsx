@@ -1,6 +1,6 @@
 
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { PROVIDER_ID, WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
+import { WalletProvider as UseWalletProvider } from '@txnlab/use-wallet-react';
 import { PeraWalletConnect } from '@perawallet/connect';
 import { DeflyWalletConnect } from '@blockshake/defly-connect';
 import { DaffiWalletConnect } from '@daffiwallet/connect';
@@ -41,20 +41,14 @@ export function WalletProvider({ children }: PropsWithChildren) {
   
   return (
     <UseWalletProvider
-      id="wallet-provider"
-      name="IP Nexus"
-      providers={[
-        { id: PROVIDER_ID.PERA, clientStatic: pera },
-        { id: PROVIDER_ID.DEFLY, clientStatic: defly },
-        { id: PROVIDER_ID.DAFFI, clientStatic: daffi }
-      ]}
-      nodeConfig={{
-        network: 'testnet',
-        nodeServer: algodServer,
-        nodeToken: algodToken,
-        nodePort: algodPort,
+      value={{
+        wallets: [
+          { name: 'Pera Wallet', connector: pera },
+          { name: 'Defly Wallet', connector: defly },
+          { name: 'Daffi Wallet', connector: daffi }
+        ],
+        algodClient
       }}
-      algosdkStatic={algosdk}
     >
       {children}
     </UseWalletProvider>
