@@ -23,7 +23,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   const daffi = new DaffiWalletConnect();
 
   // Configure wallets with metadata 
-  const walletProviders = [
+  const wallets = [
     { id: 'pera', name: 'Pera', wallet: pera, metadata: { name: 'Pera', icon: 'https://perawallet.app/favicon.ico' } },
     { id: 'defly', name: 'Defly', wallet: defly, metadata: { name: 'Defly', icon: 'https://defly.app/favicon.ico' } },
     { id: 'daffi', name: 'Daffi', wallet: daffi, metadata: { name: 'Daffi', icon: 'https://daffi.me/favicon.ico' } },
@@ -31,9 +31,11 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
 
   return (
     <UseWalletProvider
-      wallets={walletProviders}
-      algodClient={algodClient}
-      network="testnet"
+      value={{
+        wallets,
+        algodClient,
+        network: 'testnet'
+      }}
     >
       {children}
     </UseWalletProvider>
