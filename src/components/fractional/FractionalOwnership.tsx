@@ -116,7 +116,7 @@ export const FractionalOwnership = () => {
                             />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value: any) => [typeof value === 'number' ? value.toFixed(2) + ' ALGO' : value, 'Value']} />
+                        <Tooltip formatter={(value) => [`${value.toFixed(2)} ALGO`, 'Value']} />
                         <Legend />
                       </PieChart>
                     </ResponsiveContainer>
