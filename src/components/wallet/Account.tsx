@@ -1,7 +1,6 @@
 
 import { useWallet } from '@txnlab/use-wallet-react';
 import { useState, useEffect } from 'react';
-import algosdk from 'algosdk';
 
 const Account = () => {
   const { activeAddress, activeAccount, algodClient } = useWallet();
@@ -12,7 +11,11 @@ const Account = () => {
       if (activeAddress && algodClient) {
         try {
           const accountInfo = await algodClient.accountInformation(activeAddress).do();
-          setBalance(accountInfo.amount / 1000000); // Convert microAlgos to Algos
+          // Convert microAlgos to Algos (handle both number and bigint types)
+          const amount = typeof accountInfo.amount === 'bigint' 
+            ? Number(accountInfo.amount) / 1000000 
+            : accountInfo.amount / 1000000;
+          setBalance(amount);
         } catch (error) {
           console.error('Error fetching balance:', error);
           setBalance(null);
@@ -32,7 +35,7 @@ const Account = () => {
       <div className="flex flex-col space-y-2">
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Connected:</span>
-          <span className="text-sm font-bold">{activeAccount?.providerId || 'Unknown Wallet'}</span>
+          <span className="text-sm font-bold">{activeAccount?.name || 'Unknown Wallet'}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Address:</span>

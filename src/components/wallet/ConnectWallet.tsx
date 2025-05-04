@@ -8,7 +8,7 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, providers, activeAddress } = useWallet();
+  const { activeAccount, wallets, activeAddress, disconnect } = useWallet();
 
   return (
     <dialog id="connect_wallet_modal" className={`modal ${openModal ? 'modal-open' : ''}`} style={{ display: openModal ? 'block' : 'none' }}>
@@ -24,23 +24,21 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
           )}
 
           {!activeAddress &&
-            providers?.map((provider) => (
+            wallets?.map((wallet) => (
               <button
-                data-test-id={`${provider.id}-connect`}
+                data-test-id={`${wallet.id}-connect`}
                 className="btn border-teal-800 border-1 m-2"
-                key={`provider-${provider.id}`}
+                key={`provider-${wallet.id}`}
                 onClick={() => {
-                  return provider.connect();
+                  return wallet.connect();
                 }}
               >
-                {provider.id !== 'kmd' && (
-                  <img
-                    alt={`wallet_icon_${provider.id}`}
-                    src={provider.metadata.icon}
-                    style={{ objectFit: 'contain', width: '30px', height: 'auto' }}
-                  />
-                )}
-                <span>{provider.id === 'kmd' ? 'LocalNet Wallet' : provider.metadata.name}</span>
+                <img
+                  alt={`wallet_icon_${wallet.id}`}
+                  src={wallet.metadata.icon}
+                  style={{ objectFit: 'contain', width: '30px', height: 'auto' }}
+                />
+                <span>{wallet.metadata.name}</span>
               </button>
             ))}
         </div>
@@ -60,16 +58,13 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
               className="btn btn-warning"
               data-test-id="logout"
               onClick={async () => {
-                if (activeAccount?.providerId) {
-                  const activeProvider = providers.find((p) => p.id === activeAccount.providerId);
-                  if (activeProvider) {
-                    await activeProvider.disconnect();
-                  } else {
-                    // Fallback cleanup
-                    localStorage.removeItem('@txnlab/use-wallet:v3');
-                    localStorage.removeItem('@txnlab/use-wallet:v4');
-                    window.location.reload();
-                  }
+                if (activeAccount) {
+                  await disconnect();
+                } else {
+                  // Fallback cleanup
+                  localStorage.removeItem('@txnlab/use-wallet:v3');
+                  localStorage.removeItem('@txnlab/use-wallet:v4');
+                  window.location.reload();
                 }
               }}
             >
