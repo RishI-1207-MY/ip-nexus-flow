@@ -11,20 +11,25 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, wallets, connectedWallets, connecting, disconnect } = useWallet();
+  const { 
+    activeAccount, 
+    wallets, 
+    isReady,
+    disconnect,
+    connecting 
+  } = useWallet();
 
-  const handleConnect = async (walletId: string) => {
-    const wallet = wallets.find(w => w.name === walletId);
-    if (wallet) {
+  const handleConnect = async (wallet: any) => {
+    try {
       await wallet.connect();
+    } catch (error) {
+      console.error("Failed to connect wallet:", error);
     }
   };
 
   const handleDisconnect = async () => {
     try {
-      if (activeAccount) {
-        await disconnect();
-      }
+      await disconnect();
     } catch (error) {
       console.error("Failed to disconnect wallet:", error);
     }
@@ -48,13 +53,13 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
             </>
           )}
 
-          {!activeAccount && wallets.map((wallet) => (
+          {!activeAccount && isReady && wallets.map((wallet) => (
             <Button
               data-test-id={`${wallet.name}-connect`}
               className="flex items-center justify-start w-full gap-2 bg-card hover:bg-card/80 text-card-foreground border border-border"
-              key={`wallet-${wallet.name}`}
+              key={`wallet-${wallet.id}`}
               variant="outline"
-              onClick={() => handleConnect(wallet.name)}
+              onClick={() => handleConnect(wallet.wallet)}
               disabled={connecting}
             >
               <div className="w-6 h-6 flex items-center justify-center rounded-full bg-muted">

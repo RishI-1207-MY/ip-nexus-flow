@@ -41,14 +41,12 @@ export function WalletProvider({ children }: PropsWithChildren) {
   
   return (
     <UseWalletProvider
-      value={{
-        wallets: [
-          { name: 'Pera Wallet', connector: pera },
-          { name: 'Defly Wallet', connector: defly },
-          { name: 'Daffi Wallet', connector: daffi }
-        ],
-        algodClient
-      }}
+      wallets={[
+        { id: 'pera', name: 'Pera Wallet', wallet: pera },
+        { id: 'defly', name: 'Defly Wallet', wallet: defly },
+        { id: 'daffi', name: 'Daffi Wallet', wallet: daffi }
+      ]}
+      algod={algodClient}
     >
       {children}
     </UseWalletProvider>
