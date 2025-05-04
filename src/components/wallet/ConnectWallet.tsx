@@ -8,11 +8,11 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, providers, isActive, connect, disconnect } = useWallet();
+  const { activeAccount, wallets, setActiveAccount } = useWallet();
 
   const handleDisconnect = async () => {
-    if (isActive) {
-      await disconnect();
+    if (activeAccount) {
+      setActiveAccount(null);
     }
   };
 
@@ -30,28 +30,36 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
           )}
 
           {!activeAccount &&
-            providers.map((provider) => (
-              <button
-                data-test-id={`${provider.id}-connect`}
-                className="btn border-teal-800 border-1 m-2"
-                key={`provider-${provider.id}`}
-                onClick={async () => {
-                  try {
-                    await connect(provider.id);
-                  } catch (error) {
-                    console.error("Failed to connect wallet:", error);
-                  }
-                }}
-              >
-                {provider.metadata?.icon && (
-                  <img
-                    alt={`wallet_icon_${provider.id}`}
-                    src={provider.metadata.icon}
-                    style={{ objectFit: 'contain', width: '30px', height: 'auto' }}
-                  />
+            wallets.map((wallet) => (
+              <div key={`wallet-${wallet.id}`} className="mb-2">
+                {wallet.accounts.length === 0 ? (
+                  <button
+                    className="btn border-teal-800 border-1 w-full"
+                    onClick={() => wallet.connect()}
+                  >
+                    {wallet.metadata?.icon && (
+                      <img
+                        alt={`wallet_icon_${wallet.id}`}
+                        src={wallet.metadata.icon}
+                        style={{ objectFit: 'contain', width: '30px', height: 'auto' }}
+                      />
+                    )}
+                    <span>Connect {wallet.metadata?.name || wallet.id}</span>
+                  </button>
+                ) : (
+                  <div className="space-y-2">
+                    {wallet.accounts.map(account => (
+                      <button
+                        key={account.address}
+                        className="btn border-teal-800 border-1 w-full"
+                        onClick={() => setActiveAccount(account)}
+                      >
+                        <span>{account.name || account.address.substring(0, 8)}</span>
+                      </button>
+                    ))}
+                  </div>
                 )}
-                <span>{provider.metadata?.name || provider.id}</span>
-              </button>
+              </div>
             ))}
         </div>
 

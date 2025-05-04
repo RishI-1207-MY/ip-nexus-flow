@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
-  const { activeAccount, connectedAccounts, isReady, isActive, connect, disconnect } = useWallet();
+  // Updated to use current API
+  const { activeAccount, wallets, isReady, setActiveAccount, signTransactions } = useWallet();
   
   const [state, setState] = useState<AlgorandState>({
     connected: !!activeAccount,
@@ -28,8 +29,16 @@ export const useAlgorand = () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
       
-      // This will open modal for selecting a wallet provider
-      await connect();
+      // In the updated API, there's no single connect method
+      // Instead, we need to add a UI to let users choose a wallet
+      // We'll just show a toast message for now
+      toast.info('Please choose a wallet to connect with', {
+        description: 'The wallet selection UI needs to be implemented.',
+        action: {
+          label: 'Got it',
+          onClick: () => {},
+        },
+      });
       
       setState(prev => ({
         ...prev,
@@ -46,12 +55,13 @@ export const useAlgorand = () => {
         description: error.message || 'Please try again',
       });
     }
-  }, [connect]);
+  }, []);
 
   const disconnectWallet = useCallback(async () => {
     try {
-      if (isActive) {
-        await disconnect();
+      if (activeAccount) {
+        // Set active account to null to disconnect
+        setActiveAccount(null);
       }
       
       setState({
@@ -68,14 +78,15 @@ export const useAlgorand = () => {
         description: error.message || 'Please try again',
       });
     }
-  }, [isActive, disconnect]);
+  }, [activeAccount, setActiveAccount]);
 
   return {
     ...state,
     connectWallet,
     disconnectWallet,
     loading: !isReady || state.loading,
-    connectedAccounts
+    // Provide the wallets array instead of connectedAccounts
+    connectedAccounts: wallets.map(wallet => wallet.accounts).flat() || []
   };
 };
 
