@@ -8,11 +8,15 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { providers, activeAccount } = useWallet();
+  const { wallets, activeAccount } = useWallet();
 
   const handleDisconnect = async () => {
     if (activeAccount) {
-      await activeAccount.disconnect();
+      if (typeof activeAccount.disconnect === 'function') {
+        await activeAccount.disconnect();
+      } else if (activeAccount.wallet && typeof activeAccount.wallet.disconnect === 'function') {
+        await activeAccount.wallet.disconnect();
+      }
     }
   };
 
@@ -30,21 +34,23 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
           )}
 
           {!activeAccount &&
-            providers?.map((provider) => (
+            wallets?.map((wallet) => (
               <button
-                data-test-id={`${provider.metadata.id}-connect`}
+                data-test-id={`${wallet.id}-connect`}
                 className="btn border-teal-800 border-1 m-2"
-                key={`provider-${provider.metadata.id}`}
+                key={`provider-${wallet.id}`}
                 onClick={() => {
-                  provider.connect();
+                  if (wallet.wallet && typeof wallet.wallet.connect === 'function') {
+                    wallet.wallet.connect();
+                  }
                 }}
               >
                 <img
-                  alt={`wallet_icon_${provider.metadata.id}`}
-                  src={provider.metadata.icon}
+                  alt={`wallet_icon_${wallet.id}`}
+                  src={wallet.metadata.icon}
                   style={{ objectFit: 'contain', width: '30px', height: 'auto' }}
                 />
-                <span>{provider.metadata.name}</span>
+                <span>{wallet.metadata.name}</span>
               </button>
             ))}
         </div>
