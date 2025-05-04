@@ -3,14 +3,14 @@ import { useWallet } from '@txnlab/use-wallet-react';
 import { useState, useEffect } from 'react';
 
 const Account = () => {
-  const { activeAddress, activeAccount, algodClient } = useWallet();
+  const { activeAccount, algodClient } = useWallet();
   const [balance, setBalance] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchBalance = async () => {
-      if (activeAddress && algodClient) {
+      if (activeAccount?.address && algodClient) {
         try {
-          const accountInfo = await algodClient.accountInformation(activeAddress).do();
+          const accountInfo = await algodClient.accountInformation(activeAccount.address).do();
           // Convert microAlgos to Algos (handle both number and bigint types)
           const amount = typeof accountInfo.amount === 'bigint' 
             ? Number(accountInfo.amount) / 1000000 
@@ -24,9 +24,9 @@ const Account = () => {
     };
 
     fetchBalance();
-  }, [activeAddress, algodClient]);
+  }, [activeAccount, algodClient]);
 
-  if (!activeAddress) {
+  if (!activeAccount?.address) {
     return null;
   }
 
@@ -35,11 +35,11 @@ const Account = () => {
       <div className="flex flex-col space-y-2">
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Connected:</span>
-          <span className="text-sm font-bold">{activeAccount?.name || 'Unknown Wallet'}</span>
+          <span className="text-sm font-bold">{activeAccount.name || 'Unknown Wallet'}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Address:</span>
-          <span className="text-xs truncate max-w-[180px]">{activeAddress}</span>
+          <span className="text-xs truncate max-w-[180px]">{activeAccount.address}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Balance:</span>

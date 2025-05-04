@@ -8,12 +8,11 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, providers, activeAddress } = useWallet();
+  const { wallets, activeAccount } = useWallet();
 
   const handleDisconnect = async () => {
-    const provider = providers.find(p => p.isActive);
-    if (provider) {
-      await provider.disconnect();
+    if (activeAccount?.wallet) {
+      await activeAccount.wallet.disconnect();
     }
   };
 
@@ -23,29 +22,29 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
         <h3 className="font-bold text-2xl">Select wallet provider</h3>
 
         <div className="grid m-2 pt-5">
-          {activeAddress && (
+          {activeAccount && (
             <>
               <Account />
               <div className="divider" />
             </>
           )}
 
-          {!activeAddress &&
-            providers.map((provider) => (
+          {!activeAccount &&
+            wallets.map((wallet) => (
               <button
-                data-test-id={`${provider.id}-connect`}
+                data-test-id={`${wallet.id}-connect`}
                 className="btn border-teal-800 border-1 m-2"
-                key={`provider-${provider.id}`}
+                key={`provider-${wallet.id}`}
                 onClick={() => {
-                  provider.connect();
+                  wallet.connect();
                 }}
               >
                 <img
-                  alt={`wallet_icon_${provider.id}`}
-                  src={provider.metadata.icon}
+                  alt={`wallet_icon_${wallet.id}`}
+                  src={wallet.metadata.icon}
                   style={{ objectFit: 'contain', width: '30px', height: 'auto' }}
                 />
-                <span>{provider.metadata.name}</span>
+                <span>{wallet.metadata.name}</span>
               </button>
             ))}
         </div>
@@ -60,7 +59,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
           >
             Close
           </button>
-          {activeAddress && (
+          {activeAccount && (
             <button
               className="btn btn-warning"
               data-test-id="logout"

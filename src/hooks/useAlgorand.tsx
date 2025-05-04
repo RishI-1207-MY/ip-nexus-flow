@@ -5,11 +5,11 @@ import { toast } from 'sonner';
 import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
-  const { activeAddress, disconnect: walletDisconnect, activeAccount, providers } = useWallet();
+  const { activeAccount, wallets, isActive } = useWallet();
   
   const [state, setState] = useState<AlgorandState>({
-    connected: !!activeAddress,
-    address: activeAddress || null,
+    connected: isActive,
+    address: activeAccount?.address || null,
     loading: false,
     error: null,
   });
@@ -17,19 +17,19 @@ export const useAlgorand = () => {
   // Update state when wallet connection changes
   useEffect(() => {
     setState({
-      connected: !!activeAddress,
-      address: activeAddress || null,
+      connected: isActive,
+      address: activeAccount?.address || null,
       loading: false,
       error: null,
     });
-  }, [activeAddress]);
+  }, [activeAccount, isActive]);
 
   const connectWallet = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
       
-      // The actual connection will be handled by ConnectWallet component
-      // This function can be used to show the modal
+      // The actual connection will be handled by the wallet UI
+      // This function is mainly used to show a connect modal if needed
       setState(prev => ({
         ...prev,
         loading: false,
@@ -49,8 +49,8 @@ export const useAlgorand = () => {
 
   const disconnectWallet = useCallback(async () => {
     try {
-      if (activeAccount && walletDisconnect) {
-        await walletDisconnect();
+      if (activeAccount && activeAccount.wallet) {
+        await activeAccount.wallet.disconnect();
       }
       
       setState({
@@ -67,7 +67,7 @@ export const useAlgorand = () => {
         description: error.message || 'Please try again',
       });
     }
-  }, [activeAccount, walletDisconnect]);
+  }, [activeAccount]);
 
   return {
     ...state,
