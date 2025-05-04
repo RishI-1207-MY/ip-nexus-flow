@@ -20,6 +20,8 @@ const Account = () => {
           console.error('Error fetching balance:', error);
           setBalance(null);
         }
+      } else {
+        setBalance(null);
       }
     };
 

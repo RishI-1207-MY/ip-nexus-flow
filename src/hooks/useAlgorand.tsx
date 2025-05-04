@@ -5,10 +5,10 @@ import { toast } from 'sonner';
 import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
-  const { activeAccount, wallets, isActive } = useWallet();
+  const { activeAccount, connecting } = useWallet();
   
   const [state, setState] = useState<AlgorandState>({
-    connected: isActive,
+    connected: !!activeAccount,
     address: activeAccount?.address || null,
     loading: false,
     error: null,
@@ -17,12 +17,12 @@ export const useAlgorand = () => {
   // Update state when wallet connection changes
   useEffect(() => {
     setState({
-      connected: isActive,
+      connected: !!activeAccount,
       address: activeAccount?.address || null,
       loading: false,
       error: null,
     });
-  }, [activeAccount, isActive]);
+  }, [activeAccount]);
 
   const connectWallet = useCallback(async () => {
     try {
@@ -49,8 +49,8 @@ export const useAlgorand = () => {
 
   const disconnectWallet = useCallback(async () => {
     try {
-      if (activeAccount && activeAccount.wallet) {
-        await activeAccount.wallet.disconnect();
+      if (activeAccount) {
+        await activeAccount.disconnect();
       }
       
       setState({
@@ -73,6 +73,7 @@ export const useAlgorand = () => {
     ...state,
     connectWallet,
     disconnectWallet,
+    loading: connecting || state.loading
   };
 };
 
