@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
-  const { activeAccount, connect, disconnect, isConnected, isLoading } = useWallet();
+  const { activeAccount, setActiveAccount, wallets, isReady } = useWallet();
   
   const [state, setState] = useState<AlgorandState>({
     connected: !!activeAccount,
@@ -28,8 +28,19 @@ export const useAlgorand = () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
       
-      // This will trigger the wallet connect UI
-      await connect();
+      // Find available active wallets
+      const availableWallet = wallets.find(wallet => wallet.isActive);
+      
+      if (availableWallet) {
+        // This will trigger the wallet's connection UI
+        const accounts = await availableWallet.connect();
+        
+        if (accounts && accounts.length > 0) {
+          setActiveAccount(accounts[0]);
+        }
+      } else {
+        throw new Error('No wallet provider is available');
+      }
       
       setState(prev => ({
         ...prev,
@@ -46,12 +57,20 @@ export const useAlgorand = () => {
         description: error.message || 'Please try again',
       });
     }
-  }, [connect]);
+  }, [wallets, setActiveAccount]);
 
   const disconnectWallet = useCallback(async () => {
     try {
       if (activeAccount) {
-        await disconnect();
+        const activeWallet = wallets.find(
+          wallet => wallet.accounts.some(acc => acc.address === activeAccount.address)
+        );
+        
+        if (activeWallet) {
+          await activeWallet.disconnect();
+        }
+        
+        setActiveAccount(null);
       }
       
       setState({
@@ -68,13 +87,13 @@ export const useAlgorand = () => {
         description: error.message || 'Please try again',
       });
     }
-  }, [activeAccount, disconnect]);
+  }, [activeAccount, wallets, setActiveAccount]);
 
   return {
     ...state,
     connectWallet,
     disconnectWallet,
-    loading: isLoading || state.loading
+    loading: !isReady || state.loading
   };
 };
 

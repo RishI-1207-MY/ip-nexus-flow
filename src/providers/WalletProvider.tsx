@@ -28,19 +28,16 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
 
   // Configure the wallets that will be used in the app
   const wallets = useMemo(() => [
-    { name: 'Pera', adapter: pera },
-    { name: 'Defly', adapter: defly },
-    { name: 'Daffi', adapter: daffi }
+    { id: 'pera-wallet', name: 'Pera', adapter: pera },
+    { id: 'defly-wallet', name: 'Defly', adapter: defly },
+    { id: 'daffi-wallet', name: 'Daffi', adapter: daffi }
   ], [pera, defly, daffi]);
 
   return (
     <UseWalletProvider
-      id="walletProvider"
       wallets={wallets}
       network="testnet"
-      nodeServer={algodServer}
-      nodePort={algodPort}
-      nodeToken={algodToken}
+      algodClient={algodClient}
     >
       {children}
     </UseWalletProvider>
