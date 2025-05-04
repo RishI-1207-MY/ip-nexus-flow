@@ -2,33 +2,38 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AlgorandState } from '@/types';
 import { toast } from 'sonner';
+import { useWallet } from '@txnlab/use-wallet-react';
 
 export const useAlgorand = () => {
+  const { activeAddress, providers, activeAccount } = useWallet();
+  
   const [state, setState] = useState<AlgorandState>({
-    connected: false,
-    address: null,
+    connected: !!activeAddress,
+    address: activeAddress || null,
     loading: false,
     error: null,
   });
+
+  // Update state when wallet connection changes
+  useEffect(() => {
+    setState({
+      connected: !!activeAddress,
+      address: activeAddress || null,
+      loading: false,
+      error: null,
+    });
+  }, [activeAddress]);
 
   const connectWallet = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
       
-      // This is a mockup that would be replaced with actual Algorand wallet connection
-      // In a real app, we would use PeraWallet or another Algorand wallet connector
-      setTimeout(() => {
-        const mockAddress = 'ALGO' + Math.random().toString(36).substring(2, 15).toUpperCase();
-        setState({
-          connected: true,
-          address: mockAddress,
-          loading: false,
-          error: null,
-        });
-        toast.success("Wallet connected successfully", {
-          description: `Connected to address ${mockAddress.substring(0, 10)}...`,
-        });
-      }, 1000);
+      // The actual connection will be handled by ConnectWallet component
+      // This function can be used to show the modal
+      setState(prev => ({
+        ...prev,
+        loading: false,
+      }));
     } catch (error: any) {
       console.error('Failed to connect wallet:', error);
       setState(prev => ({
@@ -42,34 +47,30 @@ export const useAlgorand = () => {
     }
   }, []);
 
-  const disconnectWallet = useCallback(() => {
-    setState({
-      connected: false,
-      address: null,
-      loading: false,
-      error: null,
-    });
-    toast.success('Wallet disconnected');
-  }, []);
-
-  // Check if wallet is already connected on component mount
-  useEffect(() => {
-    // In a real app, we'd check localStorage or the wallet SDK
-    // This is a mockup for demonstration
-    const checkWalletConnection = async () => {
-      try {
-        // Mock wallet check
-        const connected = false; // default to not connected
-        if (connected) {
-          connectWallet();
+  const disconnectWallet = useCallback(async () => {
+    try {
+      if (activeAccount?.providerId) {
+        const activeProvider = providers.find((p) => p.id === activeAccount.providerId);
+        if (activeProvider) {
+          await activeProvider.disconnect();
         }
-      } catch (error) {
-        console.error('Error checking wallet connection:', error);
       }
-    };
-
-    checkWalletConnection();
-  }, [connectWallet]);
+      
+      setState({
+        connected: false,
+        address: null,
+        loading: false,
+        error: null,
+      });
+      
+      toast.success('Wallet disconnected');
+    } catch (error: any) {
+      console.error('Failed to disconnect wallet:', error);
+      toast.error('Failed to disconnect wallet', {
+        description: error.message || 'Please try again',
+      });
+    }
+  }, [activeAccount, providers]);
 
   return {
     ...state,
@@ -77,3 +78,5 @@ export const useAlgorand = () => {
     disconnectWallet,
   };
 };
+
+export default useAlgorand;

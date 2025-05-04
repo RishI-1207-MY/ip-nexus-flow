@@ -10,25 +10,28 @@ import Navbar from "./components/layout/Navbar";
 import TokenizationForm from "./components/tokenization/TokenizationForm";
 import Marketplace from "./components/marketplace/Marketplace";
 import FractionalOwnership from "./components/fractional/FractionalOwnership";
+import WalletProvider from "./providers/WalletProvider";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/tokenize" element={<TokenizationForm />} />
-          <Route path="/marketplace" element={<Marketplace />} />
-          <Route path="/portfolio" element={<FractionalOwnership />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <WalletProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/tokenize" element={<TokenizationForm />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/portfolio" element={<FractionalOwnership />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </WalletProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
