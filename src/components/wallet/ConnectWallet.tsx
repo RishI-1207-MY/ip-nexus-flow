@@ -11,12 +11,11 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  const { activeAccount, wallets, disconnect } = useWallet()
+  const { activeAccount, providers, setActiveProvider } = useWallet()
 
   const handleDisconnect = async () => {
-    if (disconnect) {
-      await disconnect();
-    }
+    // The useWallet hook handles disconnection internally when setting activeProvider to null
+    setActiveProvider(null);
   };
 
   return (
@@ -37,22 +36,22 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
             </>
           )}
 
-          {!activeAccount && wallets?.map((wallet) => (
+          {!activeAccount && providers?.map((provider) => (
             <Button
-              data-test-id={`${wallet.id}-connect`}
+              data-test-id={`${provider.id}-connect`}
               className="flex items-center justify-start w-full gap-2 bg-card hover:bg-card/80 text-card-foreground border border-border"
-              key={`wallet-${wallet.id}`}
+              key={`wallet-${provider.id}`}
               variant="outline"
-              onClick={() => wallet.connect()}
+              onClick={() => setActiveProvider(provider.id)}
             >
-              {wallet.icon && (
+              {provider.metadata.icon && (
                 <img
-                  alt={`wallet_icon_${wallet.id}`}
-                  src={wallet.icon}
+                  alt={`wallet_icon_${provider.id}`}
+                  src={provider.metadata.icon}
                   className="w-6 h-6 object-contain"
                 />
               )}
-              <span>{wallet.name}</span>
+              <span>{provider.metadata.name}</span>
             </Button>
           ))}
 
