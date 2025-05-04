@@ -31,11 +31,9 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
 
   return (
     <UseWalletProvider
-      value={{
-        wallets: walletProviders,
-        algodClient,
-        network: 'testnet'
-      }}
+      wallets={walletProviders}
+      algodClient={algodClient}
+      network="testnet"
     >
       {children}
     </UseWalletProvider>

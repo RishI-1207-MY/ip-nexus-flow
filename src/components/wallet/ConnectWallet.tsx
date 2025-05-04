@@ -12,7 +12,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
 
   const handleDisconnect = async () => {
     if (activeAccount) {
-      await activeAccount.disconnect();
+      await activeAccount.wallet.disconnect();
     }
   };
 
